@@ -1,0 +1,68 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# =========================
+# Robot Framework outputs
+# =========================
+results/
+output.xml
+log.html
+report.html
+*.png
+
+# =========================
+# Selenium / Screenshots
+# =========================
+selenium-screenshot-*.png
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor files
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.swp
+*.bak
+
+# =========================
+# Test artifacts
+# =========================
+*.cache
+
+# =========================
+# Coverage / testing tools
+# =========================
+.coverage
+htmlcov/
+
+# =========================
+# Misc
+# =========================
+*.egg-info/
+dist/
+build/
