@@ -1,0 +1,72 @@
+name: Robot Framework Pipeline
+
+on:
+  # ✅ Manual trigger
+  workflow_dispatch:
+
+  # ✅ Daily scheduled run (6 AM UTC = 11:30 AM IST)
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ✅ Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ✅ Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ✅ Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install robotframework
+          pip install robotframework-seleniumlibrary
+          pip install selenium
+
+      # ✅ Install Chrome browser
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      # ✅ Install ChromeDriver
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      # ✅ Run Robot tests
+      - name: Run Robot Tests
+        run: |
+          robot -d results tests/
+
+      # ✅ Upload results as artifact (for debugging/report download)
+      - name: Upload Robot Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-results
+          path: results/
+
+      # ✅ Upload to AIO Test (your curl integration)
+      - name: Upload results to AIO Test
+        if: always()
+        run: |
+          if [ -f results/output.xml ]; then
+            echo "Uploading results to AIO..."
+            curl -X POST "https://tcms.aiojiraapps.com/aio-tcms/api/v1/project/SCRUM/testcycle/SCRUM-CY-46/import/results?type=Robot" \
+            -H "accept: application/json;charset=utf-8" \
+            -H "Authorization: AioAuth ${{ secrets.AIO_API_TOKEN }}" \
+            -H "Content-Type: multipart/form-data" \
+            -F "updateDatasets=false" \
+            -F "createNewRun=true" \
+            -F "updateOnlyRunStatus=true" \
+            -F "addCaseToCycle=false" \
+            -F "file=@results/output.xml;type=text/xml"
+          else
+            echo "output.xml not found! Skipping upload."
+          fi
