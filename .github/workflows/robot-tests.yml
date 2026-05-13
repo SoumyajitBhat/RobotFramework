@@ -1,10 +1,7 @@
 name: Robot Framework Pipeline
 
 on:
-  # ✅ Manual trigger
   workflow_dispatch:
-
-  # ✅ Daily scheduled run (6 AM UTC = 11:30 AM IST)
   schedule:
     - cron: "0 6 * * *"
 
@@ -23,15 +20,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      # ✅ Install dependencies
+      # ✅ Install dependencies (FIXED: added pyotp)
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install robotframework
           pip install robotframework-seleniumlibrary
           pip install selenium
+          pip install pyotp
 
-      # ✅ Install Chrome browser
+      # ✅ Install Chrome
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
 
@@ -39,12 +37,15 @@ jobs:
       - name: Install ChromeDriver
         uses: nanasess/setup-chromedriver@v2
 
-      # ✅ Run Robot tests
+      # ✅ Run Robot tests (FIXED: headless mode)
       - name: Run Robot Tests
         run: |
-          robot -d results tests/
+          robot -d results \
+          --variable BROWSER:chrome \
+          --variable HEADLESS:True \
+          tests/
 
-      # ✅ Upload results as artifact (for debugging/report download)
+      # ✅ Upload results (always runs)
       - name: Upload Robot Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,7 +53,7 @@ jobs:
           name: robot-results
           path: results/
 
-      # ✅ Upload to AIO Test (your curl integration)
+      # ✅ Upload to AIO
       - name: Upload results to AIO Test
         if: always()
         run: |
