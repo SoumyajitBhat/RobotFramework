@@ -5,10 +5,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# =========================
 # Virtual environments
+# =========================
 venv/
-.env/
 .venv/
+.env/
 
 # =========================
 # Robot Framework outputs
@@ -18,11 +20,19 @@ output.xml
 log.html
 report.html
 *.png
+selenium-screenshot-*.png
 
 # =========================
-# Selenium / Screenshots
+# Logs
 # =========================
-selenium-screenshot-*.png
+*.log
+
+# =========================
+# Coverage / testing tools
+# =========================
+.coverage
+htmlcov/
+.cache
 
 # =========================
 # OS files
@@ -38,11 +48,6 @@ Thumbs.db
 *.iml
 
 # =========================
-# Logs
-# =========================
-*.log
-
-# =========================
 # Temporary files
 # =========================
 *.tmp
@@ -50,19 +55,27 @@ Thumbs.db
 *.bak
 
 # =========================
-# Test artifacts
-# =========================
-*.cache
-
-# =========================
-# Coverage / testing tools
-# =========================
-.coverage
-htmlcov/
-
-# =========================
-# Misc
+# Build / packaging
 # =========================
 *.egg-info/
 dist/
 build/
+
+# =========================
+# GitHub Actions artifacts (optional)
+# =========================
+*.zip
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+
+# =========================
+# Optional: Ignore local test outputs inside subfolders
+# =========================
+**/results/
+**/output.xml
+**/log.html
+**/report.html

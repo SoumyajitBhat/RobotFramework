@@ -1,0 +1,42 @@
+image: python:3.11
+
+pipelines:
+  default:
+    - step:
+        name: Run Robot Tests
+        caches:
+          - pip
+        script:
+          - pip install --upgrade pip
+          - pip install -r requirements.txt
+
+          # Install Chrome + Driver
+          - apt-get update
+          - apt-get install -y chromium chromium-driver
+
+          # Run Robot tests
+          - robot -d results \
+            --variable BROWSER:chrome \
+            --variable HEADLESS:True \
+            tests/
+
+        artifacts:
+          - results/**
+
+        after-script:
+          # ✅ Upload to AIO (always runs, like GitHub "if: always()")
+          - |
+            if [ -f results/output.xml ]; then
+              echo "Uploading results to AIO..."
+              curl -X POST "https://tcms.aiojiraapps.com/aio-tcms/api/v1/project/SCRUM/testcycle/SCRUM-CY-46/import/results?type=Robot" \
+              -H "accept: application/json;charset=utf-8" \
+              -H "Authorization: AioAuth $AIO_API_TOKEN" \
+              -H "Content-Type: multipart/form-data" \
+              -F "updateDatasets=false" \
+              -F "createNewRun=true" \
+              -F "updateOnlyRunStatus=true" \
+              -F "addCaseToCycle=false" \
+              -F "file=@results/output.xml;type=text/xml"
+            else
+              echo "output.xml not found! Skipping upload."
+            fi
